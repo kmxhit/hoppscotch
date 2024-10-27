@@ -311,10 +311,10 @@ watch(
             env: {
               key: e.key,
               value: e.secret
-                ? secretEnvironmentService.getSecretEnvironmentVariable(
+                ? (secretEnvironmentService.getSecretEnvironmentVariable(
                     editingID.value ?? "",
                     index
-                  )?.value ?? ""
+                  )?.value ?? "")
                 : e.value,
               secret: e.secret,
             },
@@ -352,6 +352,10 @@ const removeEnvironmentVariable = (id: number) => {
 const isLoading = ref(false)
 
 const saveEnvironment = async () => {
+  if (isLoading.value) {
+    return
+  }
+
   isLoading.value = true
 
   if (!editingName.value) {

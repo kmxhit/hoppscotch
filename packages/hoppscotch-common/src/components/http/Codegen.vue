@@ -143,6 +143,14 @@ const tabs = useService(RESTTabService)
 const request = computed(() =>
   cloneDeep(tabs.currentActiveTab.value.document.request)
 )
+//Retrieve the document
+const document = computed(() => cloneDeep(tabs.currentActiveTab.value.document))
+//Set inheritedHeaders if existing
+const inheritedHeaders = computed(() => {
+  const inheritedProperties = document.value.inheritedProperties
+  return inheritedProperties ? inheritedProperties.headers : []
+})
+
 const codegenType = ref<CodegenName>("shell-curl")
 const errorState = ref(false)
 
@@ -190,15 +198,23 @@ const requestCode = asyncComputed(async () => {
     true
   )
 
+  //Generate code, adding the inheritedHeaders to the headers array
   const result = generateCode(
     lang,
     makeRESTRequest({
       ...effectiveRequest,
       body: resolvesEnvsInBody(effectiveRequest.body, env),
-      headers: effectiveRequest.effectiveFinalHeaders.map((header) => ({
-        ...header,
-        active: true,
-      })),
+      headers: [
+        ...(inheritedHeaders.value
+          ? inheritedHeaders.value.map((header) => ({
+              ...header.inheritedHeader,
+            }))
+          : []),
+        ...effectiveRequest.effectiveFinalHeaders.map((header) => ({
+          ...header,
+          active: true,
+        })),
+      ],
       params: effectiveRequest.effectiveFinalParams.map((param) => ({
         ...param,
         active: true,

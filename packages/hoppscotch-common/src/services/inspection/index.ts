@@ -131,7 +131,7 @@ export class InspectionService extends Service {
           this.restTab.currentActiveTab.value.document.type === "request"
             ? this.restTab.currentActiveTab.value.document.request
             : this.restTab.currentActiveTab.value.document.response
-                .originalRequest
+                ?.originalRequest
         )
 
         const currentTabResponse = computed(() =>
